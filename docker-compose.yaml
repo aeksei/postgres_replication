@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  master:
+    build: .
+    environment:
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    volumes:
+      - ./data/master/.ssh:/var/lib/postgresql/.ssh
+      - ./data/replica/.ssh/id_rsa.pub:/var/lib/postgresql/.ssh/authorized_keys
+
+  replica:
+      build: .
+      environment:
+        - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      volumes:
+        - ./data/replica/.ssh:/var/lib/postgresql/.ssh
+        - ./data/master/.ssh/id_rsa.pub:/var/lib/postgresql/.ssh/authorized_keys
