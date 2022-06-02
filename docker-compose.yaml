@@ -8,7 +8,10 @@ services:
     volumes:
       - ./data/master/.ssh:/var/lib/postgresql/.ssh
       - ./data/replica/.ssh/id_rsa.pub:/var/lib/postgresql/.ssh/authorized_keys
-
+      - ./data/master/data/:/var/lib/postgresql/data/
+    ports:
+      - 15432:5432
+    entrypoint: top -b
   replica:
       build: .
       environment:
@@ -16,3 +19,9 @@ services:
       volumes:
         - ./data/replica/.ssh:/var/lib/postgresql/.ssh
         - ./data/master/.ssh/id_rsa.pub:/var/lib/postgresql/.ssh/authorized_keys
+        - ./data/replica/data/:/var/lib/postgresql/data/
+      ports:
+        - 25432:5432
+
+volumes:
+  postgres_master_data:

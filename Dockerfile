@@ -9,7 +9,18 @@ RUN apt-get update \
   && apt-get install pg-probackup-10-dbg \
   && apt-get clean
 
-COPY setup.sh ./setup.sh
-RUN chmod +x ./setup.sh
+ENV POSTGRES_HOME=/var/lib/postgresql
+RUN mkdir $POSTGRES_HOME/.ssh
+RUN ssh-keygen -q -t rsa -N '' -f $POSTGRES_HOME/.ssh/id_rsa
 
-ENTRYPOINT  ./setup.sh && ./docker-entrypoint.sh postgres
+RUN mkdir -p $POSTGRES_HOME/backup_db \
+  && echo "BACKUP_PATH=$POSTGRES_HOME/backup_db" >> $POSTGRES_HOME/.bash_profile \
+  && echo "export BACKUP_PATH" >> $POSTGRES_HOME/.bash_profile \
+  && echo "alias pg_probackup='pg_probackup-10'">>$POSTGRES_HOME/.bash_profile \
+  && chown postgres -R $POSTGRES_HOME
+
+COPY setup.sh ./setup.sh
+#COPY bkp_base.sh ./bkp_base.sh
+#RUN chmod +x ./setup.sh ./bkp_base.sh
+
+ENTRYPOINT  service ssh restart && ./docker-entrypoint.sh postgres
