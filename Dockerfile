@@ -19,8 +19,9 @@ RUN mkdir -p $POSTGRES_HOME/backup_db \
   && echo "alias pg_probackup='pg_probackup-10'">>$POSTGRES_HOME/.bash_profile \
   && chown postgres -R $POSTGRES_HOME
 
-COPY setup.sh ./setup.sh
-#COPY bkp_base.sh ./bkp_base.sh
-#RUN chmod +x ./setup.sh ./bkp_base.sh
+COPY init_backup.sh ./init_backup.sh
+COPY start_sshd.sh ./start_sshd.sh
+RUN chmod +x ./init_backup.sh ./start_sshd.sh
 
-ENTRYPOINT  service ssh restart && ./docker-entrypoint.sh postgres
+
+ENTRYPOINT service ssh restart && ./docker-entrypoint.sh postgres

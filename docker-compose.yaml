@@ -3,23 +3,26 @@ version: "3"
 services:
   master:
     build: .
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
     environment:
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     volumes:
+      - ./master_postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./master_init.sh:/docker-entrypoint-initdb.d/master_init.sh
       - ./data/master/.ssh:/var/lib/postgresql/.ssh
       - ./data/replica/.ssh/id_rsa.pub:/var/lib/postgresql/.ssh/authorized_keys
-      - ./data/master/data/:/var/lib/postgresql/data/
+#      - ./data/master/data/:/var/lib/postgresql/data/
     ports:
       - 15432:5432
-    entrypoint: top -b
   replica:
       build: .
       environment:
         - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
       volumes:
+        - ./backup_init.sh:/docker-entrypoint-initdb.d/backup_init.sh
         - ./data/replica/.ssh:/var/lib/postgresql/.ssh
         - ./data/master/.ssh/id_rsa.pub:/var/lib/postgresql/.ssh/authorized_keys
-        - ./data/replica/data/:/var/lib/postgresql/data/
+#        - ./data/replica/data/:/var/lib/postgresql/data/
       ports:
         - 25432:5432
 
