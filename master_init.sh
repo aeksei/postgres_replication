@@ -20,6 +20,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname backupdb <<-EOSQL
   GRANT EXECUTE ON FUNCTION pg_catalog.txid_current_snapshot() TO backup;
   GRANT EXECUTE ON FUNCTION pg_catalog.txid_snapshot_xmax(txid_snapshot) TO backup;
   GRANT EXECUTE ON FUNCTION pg_catalog.pg_control_checkpoint() TO backup;
+  GRANT SELECT ON TABLE pg_catalog.pg_database TO backup;
   COMMIT;
 EOSQL
 

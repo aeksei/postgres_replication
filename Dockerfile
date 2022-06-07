@@ -20,8 +20,8 @@ RUN mkdir -p $POSTGRES_HOME/backup_db \
   && chown postgres -R $POSTGRES_HOME
 
 COPY init_backup.sh ./init_backup.sh
-COPY start_sshd.sh ./start_sshd.sh
-RUN chmod +x ./init_backup.sh ./start_sshd.sh
+RUN chmod +x ./init_backup.sh
 
+COPY master_postgresql.conf /etc/postgresql/postgresql.conf
 
 ENTRYPOINT service ssh restart && ./docker-entrypoint.sh postgres
