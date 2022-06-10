@@ -1,11 +1,16 @@
 #!/bin/bash
 set -e
 
+# создается тестовая база для бекапа
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
   CREATE DATABASE backupdb;
 EOSQL
 
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname backupdb <<-EOSQL
+# база для бекапа
+BKP_DATABASE=backupdb
+
+# создается пользователь для подключения к базе и выполнения бекапа
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$BKP_DATABASE" <<-EOSQL
 	BEGIN;
   CREATE ROLE backup WITH LOGIN REPLICATION password 'postgres';
   GRANT USAGE ON SCHEMA pg_catalog TO backup;
@@ -24,6 +29,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname backupdb <<-EOSQL
   COMMIT;
 EOSQL
 
+# настройка для удаленного подключения
 PG_HDA_CONF=/var/lib/postgresql/data/pg_hba.conf
 echo "# pg_probackup access permission" >> $PG_HDA_CONF \
   && echo "host    backupdb   backup          all        md5" >> $PG_HDA_CONF \
